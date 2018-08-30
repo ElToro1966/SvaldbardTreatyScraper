@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 
-class SvalbardtreatySpider(scrapy.Spider):
+class SvalbardtreatySpider(CrawlSpider):
     name = 'svalbardtreaty'
     allowed_domains = ['thebarentsobserver.com',
-            'https://www.uio.no',
-            'https://www.unis.no',
-            'https://www.arctic-council.org',
-            'https://www.arctictoday.com',
-            'http://www.npolar.no',
+            'uio.no',
+            'unis.no',
+            'arctic-council.org',
+            'arctictoday.com',
+            'npolar.no',
+            'sysselmannen.no',
             ]
     start_urls = ['https://thebarentsobserver.com/en',
             'https://www.uio.no/english/research/interfaculty-research-areas/high-north/research/',
@@ -18,7 +18,14 @@ class SvalbardtreatySpider(scrapy.Spider):
             'https://www.arctic-council.org/index.php/en/',
             'https://www.arctictoday.com',
             'http://www.npolar.no/en/',
+            'https://www.sysselmannen.no/en/',
             ]
 
-    def parse(self, response):
+    rules = (
+        Rule(LinkExtractor(allow=(), restrict_css=('.pageNextPrev',)),
+             callback="parse_item",
+             follow=True),)
+
+    def parse_item(self, response):
+        print('Processing..' + response.url)
         pass
