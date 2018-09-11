@@ -1,4 +1,4 @@
-#!/home/eric/Git/SvaldbardTreatyScraper/sts/bin/python
+#!/home/eric/Git/SvaldbardTreatyScraper/env/bin/python
 
 import sys
 import getopt
