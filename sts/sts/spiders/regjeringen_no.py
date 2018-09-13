@@ -2,31 +2,35 @@
 import scrapy
 
 class RegjeringenNoSpider(scrapy.Spider):
-    '''A spider to crawl the Norwegian Government's pages covering the Treaty of Svalbard'''
+    '''A spider to crawl the Norwegian Government's pages containing news, speeches and opinions'''
     name = "regjeringen_no"
-    count = 0
-    #rules = (
-    #    Rule(LinkExtractor(allow='regjeringen\.no\/no\/[a-z_/]+$'),
-    #        'parse_category', follow=True,
-    #    ),
-    #)
-
-    def start_requests(self):
-        '''Returns an iterable of Requests which the Spider will begin to crawl from'''
-        urls = [
-            'https://www.regjeringen.no/no/aktuelt/taler_artikler/',
-            'https://www.regjeringen.no/no/aktuelt/nyheter/',
-        ]
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+    start_urls = [
+        'https://www.regjeringen.no/no/aktuelt/taler_artikler/',
+        'https://www.regjeringen.no/no/aktuelt/nyheter/',
+    ]
 
     def parse(self, response):
         '''Parses the response downloaded for each of the requests made'''
-        for article in response.css("ul.listing"):
-            yield {
-                'article_title': article.css("h2.title a::text").extract_first(),
-                'article_date': article.css("div.info span.date::text").extract_first(),
-                'article_type': article.css("div.info span.type::text").extract_first(),
-                'article_text': article.css("p.excerpts::text").extract_first(),
-            }
+        self.logger.info('Parse function called on %s', response.url)
+
+        for href in response.css('li.listItem h2.title a::attr(href)'):
+            yield response.follow(href, callback=self.parse_article)
+
+        for href in response.css('li.next a::attr(href)'):
+            yield response.follow(href, callback=self.parse)
+
+    def _extract_with_css(query):
+        return response.css(query).extract_first().strip()
+    
+    def parse_article(self, response):
+        '''Parse response for pages with a single article'''
+        self.logger.info('Parse article function called on %s', response.url)
+
+        yield {
+            'article_title': response._extract_with_css("header.article-header h1::text"),
+            'article_date': response._extract_with_css("div.article-info span.date::text"),
+            'article_type': response._extract_with_css("div.article-info span.type::text"),
+            'article_lead': response._extract_with_css("div.article-ingress p::text"),
+            'article_text': response._extract_with_css("div.article-body::text"),
+        }
 
