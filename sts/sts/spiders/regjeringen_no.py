@@ -18,19 +18,18 @@ class RegjeringenNoSpider(scrapy.Spider):
 
         for href in response.css('li.next a::attr(href)'):
             yield response.follow(href, callback=self.parse)
-
-    def _extract_with_css(query):
-        return response.css(query).extract_first().strip()
     
     def parse_article(self, response):
         '''Parse response for pages with a single article'''
         self.logger.info('Parse article function called on %s', response.url)
 
         yield {
-            'article_title': response._extract_with_css("header.article-header h1::text"),
-            'article_date': response._extract_with_css("div.article-info span.date::text"),
-            'article_type': response._extract_with_css("div.article-info span.type::text"),
-            'article_lead': response._extract_with_css("div.article-ingress p::text"),
-            'article_text': response._extract_with_css("div.article-body::text"),
+            'article_title': self._extract_with_css("header.article-header h1::text", response),
+            'article_date': self._extract_with_css("div.article-info span.date::text", response),
+            'article_type': self._extract_with_css("div.article-info span.type::text", response),
+            'article_lead': self._extract_with_css("div.article-ingress p::text", response),
+            'article_text': self._extract_with_css("div.article-body::text", response),
         }
 
+    def _extract_with_css(self, query, response):
+        return response.css(query).extract_first().strip()
