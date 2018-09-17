@@ -10,13 +10,14 @@ class RegeringenDkSpider(CrawlSpider):
 
     rules = (
         # Extract links matching '*\/nyheder\/*' and parse them with the spider's method parse_item
-        Rule(LinkExtractor(allow=('*\/nyheder\/*', )), callback='parse_item'),
+        Rule(LinkExtractor(allow=('[a-z]+\/nyheder\/[a-z]+', )), callback='parse_item'),
     )
 
     def parse_item(self, response):
-        self.logger.info('Hi, this is an item page! %s', response.url)
+        self.logger.info('This is a Danish Government news page! %s', response.url)
         item = scrapy.Item()
-        item['id'] = response.xpath('//td[@id="item_id"]/text()').re(r'ID: (\d+)')
-        item['name'] = response.xpath('//td[@id="item_name"]/text()').extract()
-        item['description'] = response.xpath('//td[@id="item_description"]/text()').extract()
+        item['title'] = response.xpath('//td[@id="item_id"]/text()').re(r'ID: (\d+)')
+        item['date'] = response.xpath('//td[@id="item_name"]/text()').extract()
+        item['category'] = response.xpath('//td[@id="item_description"]/text()').extract()
+        # Add item-text, second to last sections of article-tag
         return item
