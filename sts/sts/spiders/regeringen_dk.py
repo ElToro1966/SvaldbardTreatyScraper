@@ -15,9 +15,11 @@ class RegeringenDkSpider(CrawlSpider):
 
     def parse_item(self, response):
         self.logger.info('This is a Danish Government news page! %s', response.url)
-        item = scrapy.Item()
-        item['title'] = response.xpath('//td[@id="item_id"]/text()').re(r'ID: (\d+)')
-        item['date'] = response.xpath('//td[@id="item_name"]/text()').extract()
-        item['category'] = response.xpath('//td[@id="item_description"]/text()').extract()
-        # Add item-text, second to last sections of article-tag
-        return item
+        
+        yield {
+            'article_title': response.xpath('//section[@class="article-top"]/div/h1/text()').extract_first(),
+            'article_date': response.xpath('//section[@class="article-top"]/div/div/time/text()').extract_first(),
+            'article_type': response.xpath('//section[@class="article-top"]/div/div/span/text()').extract_first(),
+            'article_lead': response.xpath('//article/p/text()').extract_first(),
+            'article_text': ''.join(response.xpath('//article/p/text()').extract()),
+        }
