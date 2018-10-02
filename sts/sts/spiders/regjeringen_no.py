@@ -10,7 +10,13 @@ class RegjeringenNoSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        '''Parses the response downloaded for each of the requests made'''
+        '''Parses the response downloaded for each of the requests made. Some
+        contracts are mingled with this docstring.
+
+        @url https://www.regjeringen.no/no/aktuelt/nyheter/
+        @returns requests 1 
+        '''
+
         self.logger.info('Parse function called on %s', response.url)
 
         for href in response.css('li.listItem h2.title a::attr(href)'):
