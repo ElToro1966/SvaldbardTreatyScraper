@@ -11,7 +11,7 @@ class RegeringenDkSearchSpider(scrapy.Spider):
         url = 'https://www.regeringen.dk/soeg/?q='
         tag = getattr(self, 'tag', None)
         if tag is not None:
-            url = url + tag
+            url += tag
         yield scrapy_splash.SplashRequest(
             url=url, callback=self.parse, endpoint='render.html'
         )
