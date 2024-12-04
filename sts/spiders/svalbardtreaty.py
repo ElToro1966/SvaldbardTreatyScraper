@@ -28,4 +28,3 @@ class SvalbardtreatySpider(CrawlSpider):
 
     def parse_item(self, response):
         print('Processing..' + response.url)
-        pass
